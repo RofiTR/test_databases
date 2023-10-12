@@ -43,7 +43,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   DatabaseInstance databaseInstance = DatabaseInstance();
 
-  void _incrementCounter() {
+
+Future _refresh() async{
+  setState(() {
+    
+  });
+}
+
+  void _initState() {
     databaseInstance.database();
     super.initState();
   }
@@ -60,27 +67,32 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               icon: Icon(Icons.add))
         ]),
-        body: FutureBuilder<List<ProductModel>>(
-            future: databaseInstance.all(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return Center(
-                    child: Text('data masih kosong.'),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(snapshot.data![index].name ?? ''),
+        body: RefreshIndicator(
+          onRefresh: _refresh,
+          child: FutureBuilder<List<ProductModel>>(
+              future: databaseInstance.all(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.length == 0) {
+                    return Center(
+                      child: Text('data masih kosong.'),
                     );
-                  },
-                );
-              } else {
-                return Center(
-                    child: CircularProgressIndicator(color: Colors.green));
-              }
-            }));
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(snapshot.data![index].name ?? ''),
+                        subtitle: Text(snapshot.data![index].category ?? ''),
+                      
+                      );
+                    },
+                  );
+                } else {
+                  return Center(
+                      child: CircularProgressIndicator(color: Colors.green));
+                }
+              }),
+        ));
   }
 }
